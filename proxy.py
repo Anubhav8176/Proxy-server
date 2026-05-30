@@ -15,7 +15,14 @@ class MyRequestHandler(BaseHTTPRequestHandler):
 			body = e.response.content
 			status = e.response.status_code
 
-		print(f"The response is: \n header:{header},\n status: {status}\n and body:{body}")
+		print(f"Unwanted Headers: t-e: {header.get('transfer-encoding')}, connection: {header.get('connection')} and c-e: {header.get('content-encoding')}")
+
+		self.send_response(code=status)
+		for k, v in header.items():
+			if k.lower() not in ('transfer-encoding', 'connection', 'content-encoding'):
+				self.send_header(k, v)
+		self.end_headers()
+		self.wfile.write(body)
 		
 		
 
