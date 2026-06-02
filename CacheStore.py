@@ -5,8 +5,8 @@ import time
 @dataclass
 class CacheData:
     status: int
-    headers: dict = field(default_factory=dict)
     body: bytes
+    headers: dict = field(default_factory=dict)
     created_at: float = field(default_factory=time.time)
 
     def is_expired(self, ttl: int = 60)->bool:
@@ -19,6 +19,7 @@ class CacheStore:
 
     def get(self, key: str) -> CacheData | None:
         entry = self._store.get(key)
+        print(entry)
         if entry is None or entry.is_expired():
             return None
         return entry
@@ -33,3 +34,4 @@ class CacheStore:
             headers=headers,
             body=body
         )
+        print("Data set succesfully")
