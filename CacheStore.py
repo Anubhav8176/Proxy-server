@@ -25,6 +25,7 @@ class CacheStore:
         return entry
     
     def clear(self):
+        
         self._store.clear()
         print("Cache cleared!")
 
