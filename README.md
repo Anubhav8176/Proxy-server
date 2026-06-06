@@ -21,6 +21,8 @@ Client  ──→  Proxy :PORT  ──→  Origin Server
 - **In-memory caching** — responses are stored and served instantly on subsequent requests
 - **TTL-based expiry** — cached entries automatically expire after a configurable duration
 - **X-Cache headers** — every response carries `X-Cache: HIT` or `X-Cache: MISS` so you can verify caching behaviour
+- **Concurrent request handling** — multiple requests handled simultaneously via `ThreadingMixIn`, each in its own thread
+- **Thread-safe cache** — all cache reads and writes protected with `threading.Lock()` to prevent race conditions
 - **CLI interface** — start and control the proxy entirely from the command line
 - **Zero external dependencies** — uses only Python's standard library + `requests`
 
@@ -43,7 +45,12 @@ Proxy-server/
 Incoming request
       │
       ▼
- Cache lookup (CacheStore)
+ThreadedHTTPServer (ThreadingMixIn + HTTPServer)
+      │
+      ▼  spawns a new thread per request
+      │
+      ▼
+ Cache lookup (CacheStore) ← protected by threading.Lock()
       │
    ┌──┴──┐
   HIT   MISS
@@ -62,6 +69,8 @@ Incoming request
 
 On a **cache miss** the proxy fetches from the origin, stores the response, and returns it with `X-Cache: MISS`.
 On a **cache hit** the stored response is returned immediately with `X-Cache: HIT` — the origin is never contacted.
+
+Each request runs in its own thread, so multiple clients are served concurrently without queuing. The shared cache is protected by a `threading.Lock()` to prevent race conditions when two threads attempt to write the same key simultaneously.
 
 ---
 
@@ -143,6 +152,9 @@ Server starting on port 3000 → https://dummyjson.com
 | Custom HTTP response headers | `proxy.py` — `X-Cache` header |
 | Header filtering (hop-by-hop) | `proxy.py` — `SKIP_HEADERS` |
 | Python dataclasses | `CacheStore.py` — `CacheEntry` |
+| Concurrent request handling | `proxy.py` — `ThreadedHTTPServer` |
+| Thread-safe cache writes | `CacheStore.py` — `threading.Lock()` |
+| Python MRO / Mixin pattern | `proxy.py` — `ThreadingMixIn` inheritance |
 
 ---
 
@@ -154,6 +166,8 @@ Server starting on port 3000 → https://dummyjson.com
 | `argparse` | CLI argument parsing (stdlib) |
 | `dataclasses` | Structured cache entries (stdlib) |
 | `time` | TTL expiry timestamps (stdlib) |
+| `socketserver` | `ThreadingMixIn` for concurrent connections (stdlib) |
+| `threading` | `Lock()` for thread-safe cache access (stdlib) |
 | `requests` | Forwarding HTTP requests to origin |
 
 ---
