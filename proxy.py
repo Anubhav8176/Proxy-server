@@ -1,11 +1,16 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import requests
+from socketserver import ThreadingMixIn, TCPServer
 
 from CacheStore import CacheStore
 
 cache = CacheStore()
 
 SKIP_HEADERS = {'transfer-encoding', 'connection', 'content-encoding', 'keep-alive'}
+
+
+class ThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+	pass
 
 
 class MyRequestHandler(BaseHTTPRequestHandler):
@@ -18,6 +23,7 @@ class MyRequestHandler(BaseHTTPRequestHandler):
 
 		if entry:
 			self._send(status=entry.status, headers=entry.headers, body=entry.body, cache_status="HIT")
+			return
 
 		url = origin.rstrip('/') + self.path
 		try:
@@ -51,9 +57,10 @@ def start_server(port, origin):
 	#Server address and port
 	server_address = ('', port)
 
-	#Create instance of Http server
-	http_server = HTTPServer(server_address, MyRequestHandler)
+	#Create instance of Threaded Http server
+	http_server = ThreadedHTTPServer(server_address, MyRequestHandler)
 	http_server.origin = origin
+	
 	
 	print("Server starting....")
 	http_server.serve_forever()
