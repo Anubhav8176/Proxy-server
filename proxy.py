@@ -60,7 +60,7 @@ def start_server(port, origin):
 	#Create instance of Threaded Http server
 	http_server = ThreadedHTTPServer(server_address, MyRequestHandler)
 	http_server.origin = origin
-	
+	http_server.request_queue_size = 10000
 	
 	print("Server starting....")
 	http_server.serve_forever()
