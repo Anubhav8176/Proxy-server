@@ -10,9 +10,6 @@ Client  ──→  Proxy :PORT  ──→  Origin Server
          skips origin entirely
 ```
 
-> 🗺️ **This project is part of the [roadmap.sh](https://roadmap.sh/projects/caching-server) Backend Developer series.**
-> A huge shoutout to roadmap.sh for providing structured, real-world project ideas that bridge the gap between learning and building. If you're on a backend journey, their roadmaps are an incredible resource.
-
 ---
 
 ## ✨ Features
@@ -169,14 +166,6 @@ Server starting on port 3000 → https://dummyjson.com
 | `socketserver` | `ThreadingMixIn` for concurrent connections (stdlib) |
 | `threading` | `Lock()` for thread-safe cache access (stdlib) |
 | `requests` | Forwarding HTTP requests to origin |
-
----
-
-## 🗺️ Built with roadmap.sh
-
-This project was built as part of the **[Caching Server](https://roadmap.sh/projects/caching-server)** challenge from [roadmap.sh](https://roadmap.sh) — a community-driven platform with free, structured roadmaps for developers. The backend roadmap in particular is one of the best free resources for systematically building real-world backend skills.
-
-If you're learning backend development, go check them out at **[roadmap.sh](https://roadmap.sh)**.
 
 ---
 
